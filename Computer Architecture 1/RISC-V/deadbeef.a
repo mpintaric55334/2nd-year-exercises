@@ -1,0 +1,9 @@
+        lui x1,%hi(0xDEADB)
+        addi x1,x1,%lo(0xEEF)
+        addi sp,x0,0x100
+        addi x5,x0,5
+
+        halt
+
+
+

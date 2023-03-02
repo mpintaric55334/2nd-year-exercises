@@ -1,0 +1,24 @@
+        org 0
+        mov r0,#35
+        mov r1,#8
+        mov r2,#0
+        mov r3,#0x80000000
+        mov r5,#0
+        
+PORAV   ands r4,r3,r1
+        bne DIV
+        cmp r0,r1,lsl #1
+        addhs r2,r2,#1
+        movhs r1,r1,lsl#1
+        bhs PORAV
+
+DIV     cmp r0,r1
+        subhs r0,r0,r1
+        addhs r5,r5,#1
+        cmp r2,#0
+        movhi r1,r1,lsr #1
+        movhi r5,r5,lsl #1
+        subhi r2,r2,#1
+        bhi DIV
+
+KRAJ swi 123456

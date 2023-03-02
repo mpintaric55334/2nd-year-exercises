@@ -1,0 +1,115 @@
+        org 0
+        b MAIN
+        org 0x18;kod za irq
+        b IRQ
+        org 0x1C;kod za fiq
+        b FIQ
+
+MAIN    ; Inicijalizacija stogova
+        ; stog za IRQ
+        msr CPSR, #0b11010010 ; prelazak u način rada IRQ
+        mov R13, #0x10000 ; inicijalizacija R13_irq
+        ; stog za FIQ
+        msr CPSR, #0b11010001 ; prelazak u način rada FIQ
+        mov R13, #0xFC00 ; inicijalizacija R13_fiq
+        ; stog za SVC
+        msr CPSR, #0b11010011 ; prelazak u način rada SVC
+        mov R13, #0xF800 ; inicijalizacija R13_svc
+
+        ;dozvoljavanje fiq i irq
+        mrs R0, CPSR
+        bic R0, R0, #0b11000000 ; brisanje bitova 7 i 6
+        msr CPSR, R0
+
+
+        ;incijalizacija DMAC-a
+        mov R0,#0x00FF0000;adresa DMAC-a
+
+        mov R2,#0x500
+        str R2,[R0,#0x10];adresa izvora
+
+        mov R2,#0x700
+        str R2,[R0,#0x14];adresa destinacije
+
+        ldr R2,KONF
+        str R2,[R0,#0x18];T=10,B=1
+
+        mov R2,#0b10101100
+        str R2,[R0,#0x1C];konfiguracija
+        
+
+        ;pripremi brojač 
+        mov R7,#0
+
+        ;pokreni DMAC prvi put
+        mov R2, #1
+        str R2, [R0,#0] ; Control
+        
+
+
+PETLJA  cmp R7,#5;nakon 5 puta gotovo je 
+        bne PETLJA
+        b KRAJ
+
+KRAJ    swi 123456
+
+IRQ   ;kraj DMAC_a, krece 3 sekunde,upisi i 80808080
+        stmfd R13!,{R0-R4,LR}
+        adds R7,R7,#1;digni brojac
+        mov R0,#0x00FF0000
+        mov R2,#1
+        str R2,[R0,#0x4]
+        ldr R3,[R0,#20]
+        ldr R4,BROJ
+        str R4,[R3];spremi 80808080
+        ;inicijalizacija rtc-a
+        ldr R1, RTC;
+        mov R2, #0
+        str R2, [R1, #0x0C] ; pobrisati brojilo preko LR
+        str R2,[R1,#0x08];obrisi status !!!!!!!!!!!!!!!!!!!!!
+        mov R2, #3 ; 
+        str R2, [R1, #0x04] ; upisati konstantu brojenja u MR
+        mov R2, #1
+        str R2, [R1, #0x10] ; dozvoli prekid RTC-u
+
+        ldmfd R13!,{R0-R4,LR}
+        subs PC,LR,#4
+
+FIQ     ;nakon sto prode 3 sekunde,inicijaliziraj DMAC opet
+        stmfd R13!,{R0-R2,LR}
+        ;nedaj RTC-u da radi prekide dok DMAC upisuje
+        ldr R1, RTC;
+        mov R2, #0
+        str R2, [R1, #0x10] ; ne dozvoli prekid RTC-u 
+
+        mov R0,#0x00FF0000;adresa DMAC-a
+
+        mov R2,#0x500
+        str R2,[R0,#0x10];adresa izvora
+
+        mov R2,#0x700
+        str R2,[R0,#0x14];adresa destinacije
+
+        ldr R2,KONF
+        str R2,[R0,#0x18];T=10,B=1
+
+        mov R2,#0b10101100
+        str R2,[R0,#0x1C];konfiguracija
+        ;pokreni DMAC
+        mov R2, #1
+        str R2, [R0,#0] ; Control
+
+        ;zavrsi
+        ldmfd R13!,{R0-R2,LR}
+        subs PC,LR,#4
+        
+
+KONF    dw 0x000A
+BROJ    dw 0x80808080
+RTC     dw 0xFFFF0E00
+
+        
+
+
+
+

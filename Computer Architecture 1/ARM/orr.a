@@ -1,0 +1,4 @@
+        mov r0,#0b0101
+        mov r1,#0b1000
+        orr r2,r0,r1
+        swi 123456

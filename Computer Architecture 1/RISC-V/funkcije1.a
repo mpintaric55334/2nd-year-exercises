@@ -1,0 +1,54 @@
+        lui sp,%hi(0x1000)
+        addi sp,sp,%lo(0x1000)
+        #adresa prvog
+        lui x18,%hi(A)
+        addi x18,x18,%lo(A)
+        #adresa drugog
+        lui x19,%hi(B)
+        addi x19,x19,%lo(B)
+        #ucitaj prvog i skucaj ga na stog
+        lw x20,0(x18)
+        sw x20,0(sp)
+        addi sp,sp,-4
+        #ucitaj drugog i skucaj ga na stog
+        lw x21,0(x19)
+        sw x21,0(sp)
+        addi sp,sp,-4
+        #zovi funkciju
+        jal ra,funkc
+        #kraj
+        addi sp,sp,8
+        halt
+        
+funkc   sw x22,0(sp)
+        addi sp,sp,-4
+        sw x23,0(sp)
+        addi sp,sp,-4
+        sw x24,0(sp)
+        lw x22,16(sp)
+        lw x23,12(sp)
+        add x24,x22,x23
+        lui x22,%hi(REZ)
+        addi x22,x22,%lo(REZ)
+        sw x24,0(x22)
+
+        #vracanje konteksta
+        lw x24,0(sp)
+        lw x23,4(sp)
+        lw x22,8(sp)
+        addi sp,sp,8
+
+        jalr x0,0(ra)
+
+        org 0x400
+A       dw 100
+        org 0x500
+B       dw 100
+
+        org 0x800
+REZ     dw 0
+
+        org 0xFFC
+        dw 0
+        org 0x1000
+        dw 0

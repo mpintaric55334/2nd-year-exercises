@@ -1,0 +1,26 @@
+MAIN    mov sp,#0x1000
+        bl DIJELI
+DJELJ dw 35
+DJELI dw 6
+REZ dw 0
+OST dw 0
+        ldr r0,REZ
+        ldr r1,OST
+        swi 123456
+        
+
+
+DIJELI  stmfd sp!,{r0-r2}
+        ldr r0,[lr],#4;A
+        ldr r1,[lr],#4;B
+        mov r2,#0;rez
+        
+LOOP    cmp r0,r1
+        subhs r0,r0,r1
+        addhs r2,r2,#1
+        bhs LOOP
+        
+KRAJ    str r2,[lr],#4
+        str r0,[lr],#4
+        ldmfd sp!,{r0-r2}
+        mov pc,lr

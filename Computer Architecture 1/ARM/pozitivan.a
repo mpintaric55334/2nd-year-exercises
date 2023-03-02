@@ -1,0 +1,4 @@
+        mov r0,#0b0011
+        ands r1,r0,#0b1000
+        moveq r2,#1
+        swi 123456

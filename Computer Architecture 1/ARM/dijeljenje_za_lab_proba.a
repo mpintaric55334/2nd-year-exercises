@@ -1,0 +1,57 @@
+MAIN    mov sp,#0X1000
+        mov r0,#35
+        ldr r1,BROJ
+        MOV r2,#1
+        mov r3,#0
+        mov r4,#0
+        stmfa sp!,{r0,r1,r2,r3,r4}
+        BL DIJELI
+        
+        ldr r4,[sp]
+        subs sp,sp,#20
+
+
+
+DIJELI  stmfa sp!,{r0,r1,r2,r3,r4}
+        ldr r0,[sp,#-36] ;1op
+        ldr r1,[sp,#-32] ;2op
+        ldr r2,[sp,#-28] ;1pred
+        ldr r3,[sp,#-24];2pred
+        mov r4,#0;rj
+        ;negativne clanove pretvaramo u pozitivne, i pomocu predznaka operanada nalazimo predznak rjesenja
+        ;1 operand
+        cmp r2,#1
+        rsbne r0,r0,#0;operand je negativan,spremamo njegov komplement
+        ;2 operand
+        cmp r3,#1
+        rsbne r1,r1,#0;;operand je negativan,spremamo njegov komplement
+        ;r4 ce postati registar u kojeg spremamo predzank rjesenja
+        cmp r2,r3
+        movne r2,#0;nisu isti,negativan je
+        moveq r2,#1;isti su, pozitivan je
+
+
+        mov r4,#0;rjesenje
+        
+        ;pocinje dijeljenje
+        cmp r1,#0
+        moveq r4,#0
+        beq GOTOVO
+
+PETLJA  cmp r0,r1;dok je r6>r7
+        addhs r4,r4,#1;rezultat se dize za 1
+        subhs r0,r0,r1
+        bhs PETLJA
+
+GOTOVO  ;predznak rj
+        cmp r2,#1
+        rsbne r4,r4,#0;negativan broj
+        str r4,[sp,#-20];spremi rezultat
+        ldmfa sp!,{r0,r1,r2,r3,r4}
+        
+        mov pc,lr
+         
+
+
+
+BROJ DW 0XFFFFFFFE

@@ -1,0 +1,31 @@
+        org 0
+        mov r0,#101;A
+        mov r1,#50;B
+        mov r2,#0;rezultat
+        mov r3,#0;br_pomaka
+        tst r2,r1
+        bhi KRAJ
+
+PORAV   ands r4,r1,#0x80000000;check MSB
+        bne DIV
+        cmp r0,r1,lsl #1;A>=2B
+        blo DIV
+        add r3,r3,#1;povecaj broj pomaka
+        mov r1,r1,lsl #1;shift B
+        B PORAV
+
+DIV     cmp r0,r1
+        subhs r0,r0,r1
+        addhs r2,r2,#1
+        cmp r3,#0
+        movne r1,r1,lsr #1
+        movne r2,r2,lsl #1
+        subne r3,r3,#1
+        bne DIV
+
+KRAJ    swi 123456
+        
+
+
+
+

@@ -1,0 +1,207 @@
+        ;#inicijalizacija stoga
+        lui sp,%hi(0x5000)
+        addi sp,sp,%lo(0x5000)
+
+        ;#ucitavanje adrese
+        lui x18,%hi(0x500)
+        addi x18,x18,%lo(0x500)   
+        ;#ucitavanje GPIO
+        lui x19,%hi(GPIO)
+        addi x19,x19,%lo(GPIO);#adresa gpioa
+        lw x20,0(x19)     ;#GPIO
+        lw x10,0(x18)
+        addi x31,x0,0x00 ;#pb_ddr
+        sw x31,12(x20);#spremi pb_ddr
+        ;#dodavanje vrijednosti registrima
+        addi x21,x0,100 ;#x21=100
+        addi x22,x0,90 ;#x21=90
+        addi x23,x0,50 ;#x21=50
+        addi x24,x0,40 ;#x21=40
+        addi x25,x0,10 ;#x21=10
+        addi x26,x0,9 ;#x21=9
+        addi x27,x0,5 ;#x21=5
+        addi x28,x0,4 ;#x21=4
+        addi x29,x0,1 ;#x21=1
+
+        jal ra,PRETVORI
+        halt
+
+
+
+PRETVORI
+
+        ;#kontekst
+        sw x30,0(sp)
+        addi sp,sp,-4     
+        ;#ocisti
+        addi x30,x0,0x0D
+        andi x30,x30,0x7F
+        sw x30,4(x20)
+        ori x30,x30,0x80
+        sw x30,4(x20)
+        andi x30,x30,0x7F
+        sw x30,4(x20)   
+
+petlja  beq x10,x0,gotovo
+        bge x10,x21,sto
+        bge x10,x22,deved
+        bge x10,x23,pede
+        bge x10,x24,cetrd
+        bge x10,x25,deset
+        bge x10,x26,devet
+        bge x10,x27,pet
+        bge x10,x28,cetri
+        bge x10,x29,jedn
+
+sto     ;#100=C
+        addi x30,x0,0x43
+        andi x30,x30,0x7F
+        sw x30,4(x20)
+        ori x30,x30,0x80
+        sw x30,4(x20)
+        andi x30,x30,0x7F
+        sw x30,4(x20)
+        addi x10,x10,-100
+        jal x0,petlja
+
+deved   ;#90=XC
+        ;#X
+        addi x30,x0,0x58
+        andi x30,x30,0x7F
+        sw x30,4(x20)
+        ori x30,x30,0x80
+        sw x30,4(x20)
+        andi x30,x30,0x7F
+        sw x30,4(x20)
+        ;#C
+        addi x30,x0,0x43
+        andi x30,x30,0x7F
+        sw x30,4(x20)
+        ori x30,x30,0x80
+        sw x30,4(x20)
+        andi x30,x30,0x7F
+        sw x30,4(x20)
+        addi x10,x10,-90
+        jal x0,petlja
+
+pede    ;#50=L
+        addi x30,x0,0x4C
+        andi x30,x30,0x7F
+        sw x30,4(x20)
+        ori x30,x30,0x80
+        sw x30,4(x20)
+        andi x30,x30,0x7F
+        sw x30,4(x20)
+        addi x10,x10,-50
+        jal x0,petlja
+cetrd   ;#40=XL
+        ;#X
+        addi x30,x0,0x58
+        andi x30,x30,0x7F
+        sw x30,4(x20)
+        ori x30,x30,0x80
+        sw x30,4(x20)
+        andi x30,x30,0x7F
+        sw x30,4(x20)
+        ;#L
+        addi x30,x0,0x4C
+        andi x30,x30,0x7F
+        sw x30,4(x20)
+        ori x30,x30,0x80
+        sw x30,4(x20)
+        andi x30,x30,0x7F
+        sw x30,4(x20)
+        addi x10,x10,-40
+        jal x0,petlja
+
+deset   ;#10=X
+        addi x30,x0,0x58
+        andi x30,x30,0x7F
+        sw x30,4(x20)
+        ori x30,x30,0x80
+        sw x30,4(x20)
+        andi x30,x30,0x7F
+        sw x30,4(x20)
+        addi x10,x10,-10
+        jal x0,petlja
+
+devet   ;#9=IX
+        ;#I
+        addi x30,x0,0x49
+        andi x30,x30,0x7F
+        sw x30,4(x20)
+        ori x30,x30,0x80
+        sw x30,4(x20)
+        andi x30,x30,0x7F
+        sw x30,4(x20)
+        ;#L
+        addi x30,x0,0x58
+        andi x30,x30,0x7F
+        sw x30,4(x20)
+        ori x30,x30,0x80
+        sw x30,4(x20)
+        andi x30,x30,0x7F
+        sw x30,4(x20)
+        addi x10,x10,-9
+        jal x0,petlja
+
+pet     ;#5=V
+        addi x30,x0,0x56
+        andi x30,x30,0x7F
+        sw x30,4(x20)
+        ori x30,x30,0x80
+        sw x30,4(x20)
+        andi x30,x30,0x7F
+        sw x30,4(x20)
+        addi x10,x10,-5
+        jal x0,petlja
+
+cetri   ;#4=IV
+        ;#I
+        addi x30,x0,0x49
+        andi x30,x30,0x7F
+        sw x30,4(x20)
+        ori x30,x30,0x80
+        sw x30,4(x20)
+        andi x30,x30,0x7F
+        sw x30,4(x20)
+        ;#V
+        addi x30,x0,0x56
+        andi x30,x30,0x7F
+        sw x30,4(x20)
+        ori x30,x30,0x80
+        sw x30,4(x20)
+        andi x30,x30,0x7F
+        sw x30,4(x20)
+        addi x10,x10,-4
+        jal x0,petlja
+
+jedn    ;#1=I
+        addi x30,x0,0x49
+        andi x30,x30,0x7F
+        sw x30,4(x20)
+        ori x30,x30,0x80
+        sw x30,4(x20)
+        andi x30,x30,0x7F
+        sw x30,4(x20)
+        addi x10,x10,-1
+        jal x0,petlja
+
+gotovo  
+
+        addi x30,x0,0x0A;#ucini vidljivim
+        andi x30,x30,0x7F
+        sw x30,4(x20)
+        ori x30,x30,0x80
+        sw x30,4(x20)
+        andi x30,x30,0x7F
+        sw x30,4(x20)
+
+        ;#obnovi kontekst
+        lw x30,4(sp)
+        addi sp,sp,4
+
+        jalr x0,0(ra)
+
+
+GPIO    dw 0xFFFF0F00

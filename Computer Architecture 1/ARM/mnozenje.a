@@ -1,0 +1,14 @@
+        org 0
+        mov r0,#5
+        mov r1,#5
+        mov r2,#0
+
+PETLJA  movs r1,r1,lsr #1
+        addcs r2,r2,r0
+        movs r0,r0,lsl #1
+        cmp r1,#0
+        beq KRAJ
+        b PETLJA
+
+KRAJ swi 123456
+        

@@ -1,0 +1,30 @@
+MAIN    mov sp,#0x1000
+        mov r0,#STRING
+        mov r1,#0
+        stmfa sp!,{r0,r1}
+        bl FUNKC
+        ldr r1,[sp,#4]
+        add sp,sp,#8
+        SWI 123456
+        
+FUNKC   stmfd sp!,{r3,r4,r5}
+        ldr r3,[sp,#12]
+        ldr r4,[sp,#16]
+        ldrb r5,[r3]
+
+LOOP    ldrb r5,[r3],#1
+        cmp r5,#0
+        beq KRAJ
+        cmp r5,#0x61
+        addeq r4,r4,#1
+        b LOOP
+        
+
+KRAJ    str r4,[sp,#16]
+        ldmfd sp!,{r3,r4,r5}
+        
+        mov pc,lr
+
+
+
+STRING dstr "abcabba"

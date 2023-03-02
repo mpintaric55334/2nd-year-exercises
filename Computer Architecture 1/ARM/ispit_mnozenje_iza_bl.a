@@ -1,0 +1,24 @@
+        org 0
+        mov sp,#0x10000
+        BL MNOZI
+OPER1 dw 5
+OPER2 dw 6
+REZ   dw 0
+        
+
+MNOZI   stmfd sp!,{r0-r2}
+        ldr r0,[LR],#4 ;1operand
+        ldr r1,[LR],#4  ;2operand
+        mov r2,#0;rez
+        
+LOOP    
+        movs r1,r1,lsr #1
+        addcs r2,r2,r0
+        mov r0,r0,lsl #1
+        cmp r1,#0
+        bne LOOP
+
+        str r2,[LR],#4
+        ldmfd sp!,{r0-r2}
+        mov pc,lr
+        

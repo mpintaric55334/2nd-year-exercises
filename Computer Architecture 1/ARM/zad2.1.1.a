@@ -1,0 +1,23 @@
+    org 0    
+        ldr r0,POD
+PETLJA  
+        ldr r1,[r0]
+        CMP R1,#0
+        BEQ KRAJ  
+
+POZITI BPL DALJE
+
+        add r1,r1,#1
+
+DALJE   str r1,[r0],#4
+        B PETLJA
+
+KRAJ swi 123456
+
+
+
+
+POD dw 0x1000
+
+        org 0x1000
+                dw 0x0FFFFFFFE, 0x0FFFFFFFD, 0x2, 0x0FFFFFFEF, 0x11, 0x0

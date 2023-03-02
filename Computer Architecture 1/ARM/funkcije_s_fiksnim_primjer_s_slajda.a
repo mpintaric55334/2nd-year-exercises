@@ -1,0 +1,40 @@
+MAIN    mov sp,#0x1000     
+        MOV R0,#STRING
+        STR R0, ST
+        MOV R0, #0x61
+        STR R0, CH
+        BL F ; poziv funkcije
+        LDR R0, REZ ; dohvat i upotreba rezultata
+        CMP R0, #0 ; je li vraćen NULL pokazivač?
+        BEQ KRAJ 
+        MOV R1, #0x62 ; ascii-kod slova ‘b’
+        STRB R1, [R0] ; zamijeni ‘a’ sa ‘b’
+KRAJ    swi 123456
+       
+
+
+
+
+F       stmfd sp!,{r0-r2}
+        ldr r0,ST
+        ldrb r1,CH
+
+LOOP    ldrb r2,[r0]
+        cmp r2,#0
+        moveq r0,#0
+        beq VAN
+        
+        cmp r2,r1
+        beq VAN
+
+        add r0,r0,#1
+        B LOOP
+VAN     str r0,REZ
+        ldmfd sp!,{r0-r2}
+        mov pc,lr
+
+
+ST dw 0
+CH db 0
+REZ dw 0
+STRING dstr "fgafasdf"

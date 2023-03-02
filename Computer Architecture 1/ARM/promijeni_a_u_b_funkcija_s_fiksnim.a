@@ -1,0 +1,30 @@
+MAIN    mov sp,#0x1000
+        mov r0,#STRING
+        str r0,ST
+        BL F
+        ldr r0,REZ
+        swi 123456
+        
+
+F       stmfd sp!,{r0-r2}
+        ldr r0,ST
+        mov r1,#0
+LOOP
+        ldrb r2,[r0]
+        cmp r2,#0
+        beq KRAJ
+DALJE   cmp r2,#0x61
+        moveq r2,#0x62
+        addeq r1,r1,#1
+        strb r2,[r0],#1
+        b LOOP
+KRAJ
+        str r1,REZ
+        ldmfd sp!,{r0-r2}
+        mov pc,lr
+
+
+
+ST dw 0
+REZ dw 0
+STRING dstr "abababa"

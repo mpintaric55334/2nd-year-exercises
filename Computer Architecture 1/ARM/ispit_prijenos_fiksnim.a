@@ -1,0 +1,16 @@
+        org 0
+        mov sp,#0x10000
+        BL MNOZI
+        swi 123456
+
+MNOZI   stmfd sp!,{r0-r2}
+        ldr r0,A
+        ldr r1,BA
+        mul r2,r1,r0
+        str r2,REZ
+        stmfd sp!,{r0-r2}
+        mov pc,lr
+
+A       dw 0x5
+BA      dw 0x6
+REZ     dw 0x0

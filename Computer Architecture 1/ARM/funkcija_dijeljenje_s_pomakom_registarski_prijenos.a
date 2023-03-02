@@ -1,0 +1,35 @@
+MAIN    mov sp,#0x1000
+        mov r0,#35;A
+        mov r1,#6;B
+        mov r4,#0 ;rez
+        mov r6,#0;ostatak
+
+        BL DIJELP
+        swi 123456
+
+
+DIJELP
+        stmfd sp!,{r2,r3,r5}
+        mov r5,#0;pomak
+        mov r2,r0;A
+        mov r3,r1;B
+POMAK   cmp r2,r3,lsl#1
+        addhs r5,r5,#1
+        movhs r3,r3,lsl #1
+        bhs POMAK
+
+DIV     cmp r2,r3
+        addhs r4,r4,#1
+        subhs r2,r2,r3
+        
+        cmp r5,#0
+        subhi r5,r5,#1
+        movhi r3,r3,lsr #1
+        movhi r4,r4,lsl #1
+        bhi DIV
+        mov r6,r2
+
+        ldmfd sp!,{r2,r3,r5}
+        mov pc,lr
+
+        

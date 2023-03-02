@@ -1,0 +1,36 @@
+        auipc x18,%pcrel_hi(IZVA)
+        addi x18,x18,%pcrel_lo(IZVA)
+        lui x19,%hi(IZVB)
+        addi x19,x19,%lo(IZVB) 
+        lui x20,%hi(ODR)
+        addi x20,x20,%lo(ODR) #odrediste
+        addi x21,x0,5 #counter
+        
+petlja  beq x21,x0, kraj
+        addi x21,x21,-1
+        lw x22,0(x18)#ucitavanje brojeva
+        lw x23,0(x19)
+        addi x18,x18,4
+        addi x19,x19,4
+        blt x22,x23,manjp
+
+vecp    sw x22,0(x20)
+        addi x20,x20,4
+        jal x0,petlja
+
+manjp   sw x23,0(x20)
+        addi x20,x20,4
+        jal x0,petlja
+
+
+
+kraj    halt
+                
+        org 0x6000
+IZVA    dw 100,300,500,700,900
+        org 0x8000
+IZVB    dw 200,600,400,150,1000
+
+        org 0x9000
+ODR     dw 0,0,0,0,0
+

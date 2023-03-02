@@ -1,0 +1,89 @@
+        org 0
+        b GLAVNI ;glavni dio programa
+        org 0x18
+        b IRQ ;posluzi irq prekid
+
+GLAVNI
+     
+INIT    ;incijalizacija stogova i potrebnih stvari za irq
+        ;stog za IRQ
+        msr CPSR,#0b11010010; prelazak u irq nacin rada  
+        mov R13,#0x10000
+        
+        ;stog za svc
+        msr CPSR,#0b11010011 ;prelazak u nacin rada SVC
+        mov R13,#0xF800 ;inicijalizacija R13_svc
+
+        ;dozvoljavanje prekida irq
+        mrs R0, CPSR
+        bic R0, R0, #0b10000000 ; brisanje bitova 7 i 6
+        msr CPSR, R0
+
+
+        ;nastavak glavnoga
+        ldr R0,GPIO ;dohvati adresu GPIO-a
+        mov R1,#0b11100000 ;postavljanje smjera vrata A-> 7,6,5 bit su izlazni, ostali ulazni
+        str R1,[R0,#8]; spremanje smjera u PA_DDR
+        mov R1,#0b00100000; na početku je upaljeno crveno svjetlo
+        str R1,[R0]; paljenje crvene lampice
+
+        ;inicijalizacija RTC-a
+        ldr R2,RTC; upis adrese RTC
+        mov R1,#0
+        str R1,[R2,#0x0C];pobrisi brojilo
+        
+        mov R1,#5; konstanta brojanja je 125 jer je period 25Hz
+        str R1,[R2,#0x04];upisi konstantu brojenja u MR
+
+        mov R1,#1
+        str R1,[R2,#0x10];dozvoli prekid RTC-u
+
+        mov R4,#0 ;brojac kojim pamtim stanja->0=crvena,1=crveno zuta,2=zelena,3=zuta
+PET     b PET ;prazna petlja        
+
+IRQ     ;posluzi_irq
+        stmfd R13!,{R0-R2,LR}
+        ldr R0,GPIO; adresa GPIO
+        ldr R1, RTC;adresa RTC
+        mov R2,#0
+        str R2,[R1,#0x0C];pobrisi brojilo,MR ostaje 125
+        str R2,[R1,#0x08];obrisi status
+
+        ;gledamo koja je boja na semaforu
+        cmp R4,#0
+        beq CRV
+        cmp R4,#1
+        beq CZU
+        cmp R4,#2
+        beq ZE
+        cmp R4,#3
+        beq ZU
+
+CRV     mov R2,#0b01100000;ukljuci crvenu i zutu
+        mov R4,#1
+        str R2,[R0]
+        b DALJE
+
+CZU     mov R2,#0b10000000;ukljuci zelenu
+        mov R4,#2
+        str R2,[R0]
+        b DALJE
+
+ZE      mov R2,#0b01000000;ukljuci zutu
+        mov R4,#3
+        str R2,[R0]
+        b DALJE
+
+ZU      mov R2,#0b00100000;ukljuci crvenu
+        mov R4,#0
+        str R2,[R0]
+        b DALJE
+
+DALJE   ;gotov prekid
+        ldmfd R13!,{R0-R2,LR};obnovi kontekst
+        subs PC,LR,#4;povratak u glavni program
+        
+
+
+GPIO dw 0xFFFF0B00
+RTC  dw 0xFFFF0E00

@@ -1,0 +1,72 @@
+        lui x18,%hi(GPIO)
+        addi x18,x18,%lo(GPIO)
+        lw x19,0(x18)#gpio
+        addi x20,x0,0x00 #pb_ddr
+        sw x20,12(x19)#spremi pb_ddr
+        #M
+        addi x21,x0,0x4D
+        andi x21,x21,0x7F
+        sw x21,4(x19)
+        ori x21,x21,0x80
+        sw x21,4(x19)
+        andi x21,x21,0x7F
+        sw x21,4(x19)
+        #A
+        addi x21,x0,0x41
+        andi x21,x21,0x7F
+        sw x21,4(x19)
+        ori x21,x21,0x80
+        sw x21,4(x19)
+        andi x21,x21,0x7F
+        sw x21,4(x19)
+        #T
+        addi x21,x0,0x54
+        andi x21,x21,0x7F
+        sw x21,4(x19)
+        ori x21,x21,0x80
+        sw x21,4(x19)
+        andi x21,x21,0x7F
+        sw x21,4(x19)
+        #I
+        addi x21,x0,0x49
+        andi x21,x21,0x7F
+        sw x21,4(x19)
+        ori x21,x21,0x80
+        sw x21,4(x19)
+        andi x21,x21,0x7F
+        sw x21,4(x19)
+
+        #J
+        addi x21,x0,0x4A
+        andi x21,x21,0x7F
+        sw x21,4(x19)
+        ori x21,x21,0x80
+        sw x21,4(x19)
+        andi x21,x21,0x7F
+        sw x21,4(x19)
+
+        #A
+        addi x21,x0,0x41
+        andi x21,x21,0x7F
+        sw x21,4(x19)
+        ori x21,x21,0x80
+        sw x21,4(x19)
+        andi x21,x21,0x7F
+        sw x21,4(x19)
+
+        addi x21,x0,0x0A
+        andi x21,x21,0x7F
+        sw x21,4(x19)
+        ori x21,x21,0x80
+        sw x21,4(x19)
+        andi x21,x21,0x7F
+        sw x21,4(x19)
+
+        halt
+
+
+
+
+
+
+GPIO    dw 0xFFFF0F00

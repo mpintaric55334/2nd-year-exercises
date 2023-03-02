@@ -1,0 +1,22 @@
+        org 0
+        ldr r0,ADRESA
+        ldr r3,STORE
+        mov r1,#0
+
+PETLJA  add r1,r1,#1
+        cmp r1,#50
+        beq KRAJ
+        ldr r2,[r0],#4
+        mov r2,r2,LSL #18
+        mov r2,r2,ASR #18
+        str r2,[r3],#4
+KRAJ    swi 123456
+        
+
+
+
+
+
+
+ADRESA dw 0x2100
+STORE  dw 0x3100

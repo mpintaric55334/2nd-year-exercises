@@ -1,0 +1,25 @@
+        org 0
+        ldr r0,IZVOR
+        ldr r1,ODRED
+        mov r2,#3 
+
+PETLJA        ldr r3,[r0],#4
+        mov r4,#0
+        TST r3,r3
+        bpl POZ
+NEG     rsb r3,r3,#0
+        mov r4,#0x00008000
+
+POZ     str r3,[r1],#4
+        str r4,[r1],#4
+        subs r2,r2,#1
+        beq KRAJ
+        B PETLJA
+KRAJ    swi 123456
+
+
+
+IZVOR dw 0x1000
+ODRED dw 0x2000
+        org 0x1000
+                dw 0x80000001,0x80000005,3

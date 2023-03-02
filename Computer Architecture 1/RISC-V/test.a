@@ -1,0 +1,8 @@
+        lui x1,%hi(GPIO)
+        addi x1,x1,%lo(GPIO)
+
+        lw x1,0(x1)
+
+        halt
+
+GPIO    dw 0xFFFF0000

@@ -1,0 +1,131 @@
+MAIN    mov sp,#0X3000
+        ldr r0,IZVOR;izvor
+        ldr r9,ODRED;odrediste
+        ldr r7,KONACNI;80808080
+
+LOOP    
+        ldr r1,[r0],#4;POČETAK UPISIVANJA
+        cmp r1,r7;ako je r1 80808080 skaci na kraj,gotovo sve
+        beq KRAJ
+        ldr r2,[r0],#4
+        ldr r3,[r0],#4;KRAJ UPISIVANJA
+        ;PROVJERA PREDZNAKA
+        ands r6,r2,#0x80000000
+        moveq r4,#1;AKO JE POZITIVAN PRVI OPERAND PIŠI 1 U REGISTAR
+        movne r4,#0;NEGATIVAN,PIŠI 0
+        ands r6,r3,#0x80000000
+        moveq r5,#1;AKO JE POZITIVAN DRUGI OPERAND PIŠI 1 U REGISTAR
+        movne r5,#0;NEGATIVAN,PIŠI 0
+        ;GOTOVA PROVJERA PREDZNAKA
+
+        ;GLEDAMO KOJA JE OPERACIJA 
+        ;ZBRAJANJE?
+        cmp r1,#0
+        beq ZBR
+        ;ODUZIMANJE?
+        cmp r1,#1
+        beq ODU
+        ;MNOZENJE?
+        cmp r1,#2
+        beq MNOZ
+        ;DIJELJENJE?
+        B DIJELI
+        
+
+;zbrajanje
+ZBR     add r8,r2,r3
+        str r8,[r9],#4
+        B LOOP
+        
+;oduzimanje
+ODU     rsb r3,r3,#0  ;2kompl
+        b ZBR;oduzimanje je zbrajanje s 2kompl
+
+;mnozenje
+MNOZ    ;negativne clanove pretvaramo u pozitivne, i pomocu predznaka operanada nalazimo predznak rjesenja
+        ;1 operand
+        cmp r4,#1
+        rsbne r2,r2,#0;operand je negativan,spremamo njegov komplement
+        ;2 operand
+        cmp r5,#1
+        rsbne r3,r3,#0;;operand je negativan,spremamo njegov komplement
+        ;r4 ce postati registar u kojeg spremamo predzank rjesenja
+        cmp r4,r5
+        movne r4,#0;nisu isti,negativan je
+        moveq r4,#1;isti su, pozitivan je
+        ;mnozenje
+        mul r8,r2,r3
+        ;predznak rj
+        cmp r4,#1
+        rsbne r8,r8,#0;negativan broj
+        str r8,[r9],#4
+        b LOOP
+DIJELI
+        stmfa sp!,{r2,r3,r4,r5,r8}
+        
+        BL DJEL
+        ldr r8,[sp]
+        sub sp,sp,#20
+        str r8,[r9],#4
+        B LOOP
+    
+
+KRAJ    ldr r8,ZADNJI
+        str r8,[r9],#4
+        swi 123456
+
+DJEL    stmfa sp!,{r11,r3,r8,r4,r5};kontekst
+        ldr r2,[sp,#-36];1 operand
+        ldr r3,[sp,#-32];2 operand
+        ldr r4,[sp,#-28];1 predznak
+        ldr r5,[sp,#-24];2 predznak
+        ;negativne clanove pretvaramo u pozitivne, i pomocu predznaka operanada nalazimo predznak rjesenja
+        ;1 operand
+        cmp r4,#1
+        rsbne r2,r2,#0;operand je negativan,spremamo njegov komplement
+        ;2 operand
+        cmp r5,#1
+        rsbne r3,r3,#0;;operand je negativan,spremamo njegov komplement
+        ;r4 ce postati registar u kojeg spremamo predzank rjesenja
+        cmp r4,r5
+        movne r4,#0;nisu isti,negativan je
+        moveq r4,#1;isti su, pozitivan je
+
+
+
+
+        mov r8,#0;rjesenje
+        
+        ;pocinje dijeljenje
+        cmp r3,#0
+        moveq r8,#0
+        beq GOTOVO
+
+PETLJA  cmp r2,r3;dok je r6>r7
+        addhs r8,r8,#1;rezultat se dize za 1
+        subhs r2,r2,r3
+        bhs PETLJA
+
+GOTOVO  ;predznak rj
+        cmp r4,#1
+        rsbne r8,r8,#0;negativan broj
+        str r8,[sp,#-20];spremi rezultat
+        ldmfa sp!,{r2,r3,r8,r4,r5}
+        
+        mov pc,lr
+
+        
+
+
+
+
+IZVOR dw 0X500
+ZADNJI DW 0XFFFFFFFF
+ODRED dw 0X1000
+KONACNI dw 0x80808080
+        org 0x500
+                dw 0x3, 0xFFFFFEFF, 0x00000010, 0x00000001,0x000001F4,0xFFFFFD44,0x00000002,0xFFFFFFFE,0x0000000A,0x00000003,0xFFFFF000,0xFFFFFFC0,0x80808080
+
+
+        org 0x1000
+                dw 0x0,0x0,0x0,0x0,0x0

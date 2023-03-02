@@ -1,0 +1,55 @@
+MAIN MOV SP, #0x10000
+        MOV R1, #STRN
+LOOP    LDRB R0, [R1], #1
+        CMP R0, #0 ; kraj stringa?
+        BEQ KRAJ
+        BL ISALPHA
+        CMP R0, #1
+        BNE LOOP
+SLOVO   MOV R0, #32 ; razmak=32
+        STRB R0, [R1, #-1]
+        B LOOP
+KRAJ SWI 0x123456
+STRN DSTR "As8 5kLvb7(Jd.$u"
+
+
+
+;lower
+ISLOWER cmp r0,#0X61
+        blo NIJE2
+        cmp r0,#0x7A
+        bhi NIJE2
+
+JE2   mov r0,#1
+
+NIJE2   mov r0,#0
+
+        mov pc,lr
+
+
+;upper     
+ISUPPER cmp r0,#0X41
+        blo NIJE1
+        cmp r0,#0x5A
+        bhi NIJE1
+
+JE1      mov r0,#1
+
+NIJE1    mov r0,#0
+
+        mov pc,lr
+
+;isalpha
+
+ISALPHA stmfd sp!,{lr}
+
+        BL ISLOWER
+        cmp r0,#1
+        beq KRAJ1
+
+        BL ISUPPER
+
+KRAJ1    ldmfd sp!,{lr}
+        mov pc,lr
+        
+        

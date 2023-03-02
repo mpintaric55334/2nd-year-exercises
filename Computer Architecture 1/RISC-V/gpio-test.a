@@ -1,0 +1,23 @@
+        lui x18,%hi(GPIO)#adresa gpio
+        addi x18,x18,%lo(GPIO)
+        lw x19,0(x18)#GPIO
+        addi x20,x0,0b11100000#pa_ddr
+        sw x20,8(x19)
+
+petlja  lw x21,0(x19)
+        andi x21,x21,0b10
+        bne x21,x0,uklj
+
+isklj   addi x21,x0,0
+        sw x21,0(x19)
+        jal x0,petlja
+
+uklj    addi x21,x0,0b00100000
+        sw x21,0(x19)
+        jal x0,petlja
+
+
+        
+
+
+GPIO    dw 0xFFFF0B00
